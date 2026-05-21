@@ -1,0 +1,13 @@
+{
+  "name": "eds_contacts_helper",
+  "description": "Evolution Data Server contacts helper for Thunderbird Native Messaging",
+  "path": "__HELPER_PATH__",
+  "type": "stdio",
+  "allowed_extensions": [
+    "eds-contacts-integration-v150@thierryh.local",
+    "eds-contacts-integration-v151@thierryh.local",
+    "eds-contacts-integration-v153@thierryh.local",
+    "eds-contacts-integration-v154@thierryh.local",
+    "eds-contacts-integration-v160@thierryh.local"
+  ]
+}
