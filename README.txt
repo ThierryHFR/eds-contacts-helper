@@ -1,4 +1,4 @@
-EDS Contacts Native Messaging helper 1.5.5
+EDS Contacts Native Messaging helper 1.6.6
 
 Fixes manual vCard serialization for EDS contacts when Python GI exposes BookClient but no contact vCard serializer.
 
