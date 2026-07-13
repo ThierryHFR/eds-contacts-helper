@@ -18,7 +18,8 @@ cat > "$MANIFEST_DIR/$HELPER_NAME.json" <<EOF
   "path": "$HELPER_PATH",
   "type": "stdio",
   "allowed_extensions": [
-    "thierryhfr.eds-contacts-integration@addons.thunderbird.net"
+    "thierryhfr.eds-contacts-integration@addons.thunderbird.net",
+    "eds-contacts-integration-v162@thierryh.local"
   ]
 }
 EOF
