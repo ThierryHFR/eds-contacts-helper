@@ -1,6 +1,6 @@
-EDS Contacts Native Messaging helper 1.6.6
+EDS Contacts Native Messaging helper 2.0.0
 
-Fixes manual vCard serialization for EDS contacts when Python GI exposes BookClient but no contact vCard serializer.
+Requires EDS Contacts Integration 2.0.0 with the production extension ID.
 
 Install:
   ./install-native-helper.sh

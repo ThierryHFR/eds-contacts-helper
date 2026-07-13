@@ -18,19 +18,7 @@ cat > "$MANIFEST_DIR/$HELPER_NAME.json" <<EOF
   "path": "$HELPER_PATH",
   "type": "stdio",
   "allowed_extensions": [
-    "eds-contacts-integration-v150@thierryh.local",
-    "eds-contacts-integration-v151@thierryh.local",
-    "eds-contacts-integration-v153@thierryh.local",
-    "eds-contacts-integration-v154@thierryh.local",
-    "eds-contacts-integration-v160@thierryh.local",
-    "eds-contacts-integration-v161@thierryh.local",
-    "eds-contacts-integration-v162@thierryh.local",
-    "eds-contacts-integration-v163@thierryh.local",
-    "eds-contacts-integration-v164@thierryh.local",
-    "eds-contacts-integration-v165@thierryh.local",
-    "eds-contacts-integration-v166@thierryh.local",
-    "eds-contacts-integration-v167@thierryh.local",
-    "eds-contacts-integration-v168@thierryh.local"
+    "thierryhfr.eds-contacts-integration@addons.thunderbird.net"
   ]
 }
 EOF
