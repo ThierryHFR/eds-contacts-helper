@@ -232,6 +232,8 @@ def _clean_text(value):
     return text
 
 _FIELD_TO_PROP = {
+    # E_CONTACT_UID is exposed as the GObject property "id" by libebook.
+    "UID": "id",
     "FULL_NAME": "full_name", "FN": "full_name",
     "NICKNAME": "nickname",
     "FAMILY_NAME": "family_name", "NAME_FAMILY": "family_name",
@@ -260,14 +262,39 @@ def _prop_value(contact, prop_name):
     return None
 
 
-def _contact_uid(contact, fallback=None):
+def _contact_uid(contact, EBookContacts=None, fallback=None):
+    """Return the stable EDS UID across the different GI binding shapes.
+
+    Some libebook GIR versions do not expose ``get_uid()`` even though the
+    UID is available through the GObject ``id`` property or ContactField.
+    Falling back to a list index in that situation changes the identity of a
+    contact whenever the address book order changes and breaks sync mapping.
+    """
     for name in ("get_uid", "get_id"):
         try:
-            value = getattr(contact, name)()
+            value = _clean_text(getattr(contact, name)())
             if value:
                 return value
         except Exception:
             pass
+
+    # libebook exposes E_CONTACT_UID as the GObject property "id".  Keep
+    # "uid" as a compatibility fallback for alternate/older bindings.
+    for property_name in ("id", "uid"):
+        value = _prop_value(contact, property_name)
+        if value:
+            return value
+
+    if EBookContacts is not None:
+        field = _field_enum(EBookContacts, "UID")
+        if field is not None:
+            for method_name in ("get", "get_const"):
+                try:
+                    value = _clean_text(getattr(contact, method_name)(field))
+                    if value:
+                        return value
+                except Exception:
+                    pass
     return fallback
 
 
@@ -421,7 +448,7 @@ def _contact_vcard(contact, EBookContacts=None, uid=None):
         pass
 
     emails = _contact_emails(contact, EBookContacts) if EBookContacts is not None else []
-    uid = uid or _contact_uid(contact) or ""
+    uid = uid or _contact_uid(contact, EBookContacts) or ""
     fn = full_name or " ".join([str(given or "").strip(), str(family or "").strip()]).strip() or nickname or (emails[0] if emails else uid) or "EDS Contact"
 
     lines = [
@@ -474,7 +501,10 @@ def list_contacts():
             raw_contacts, query = _get_contacts_from_client(client, EBookContacts)
             log(f"listContacts source={label} query={query!r} count={len(raw_contacts or [])}")
             for idx, contact in enumerate(raw_contacts or []):
-                uid = _contact_uid(contact, fallback=f"{source.get_uid()}:{idx}")
+                fallback_uid = f"{source.get_uid()}:{idx}"
+                uid = _contact_uid(contact, EBookContacts, fallback=fallback_uid)
+                if uid == fallback_uid:
+                    log(f"WARNING contact has no readable EDS UID; using unstable fallback {fallback_uid}")
                 contacts.append({"uid": uid, "vcard": _contact_vcard(contact, EBookContacts, uid), "source": label})
         except Exception as exc:
             errors.append(f"{label}: {exc}")
@@ -558,7 +588,7 @@ def add_contact(vcard):
     for item in values:
         if isinstance(item, str) and item:
             uid = item
-    uid = uid or _contact_uid(contact) or "unknown-uid"
+    uid = uid or _contact_uid(contact, EBookContacts) or "unknown-uid"
     log(f"Added contact to EDS source={label}")
     return {"ok": True, "uid": uid, "source": label}
 
