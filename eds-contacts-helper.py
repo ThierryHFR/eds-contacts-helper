@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Native Messaging helper for Thunderbird EDS Contacts Integration.
-Version 1.6.1: persistent Native Messaging helper with EDS change events.
+Version 2.0.0: persistent Native Messaging helper with EDS change events.
 
 Can be tested outside Thunderbird:
   ./eds-contacts-helper.py --test ping
@@ -19,7 +19,7 @@ import time
 import hashlib
 from datetime import datetime
 
-VERSION = "1.6.1"
+VERSION = "2.0.0"
 LOG_PATH = os.path.expanduser("~/.cache/eds-contacts-helper.log")
 WRITE_LOCK = threading.Lock()
 WATCH_STATE = {"running": False, "thread": None, "last_hash": None, "interval": 10}
@@ -436,7 +436,7 @@ def _contact_vcard(contact, EBookContacts=None, uid=None):
     for email in emails:
         lines.append("EMAIL;TYPE=INTERNET:" + _vcard_escape(email))
     lines.append("END:VCARD")
-    log(f"Manual vCard serialization used uid={uid!r} fn={fn!r} emails={len(emails)}")
+    log(f"Manual vCard serialization used emails={len(emails)}")
     return "\r\n".join(lines) + "\r\n"
 
 
@@ -559,7 +559,7 @@ def add_contact(vcard):
         if isinstance(item, str) and item:
             uid = item
     uid = uid or _contact_uid(contact) or "unknown-uid"
-    log(f"Added contact to EDS source={label} uid={uid}")
+    log(f"Added contact to EDS source={label}")
     return {"ok": True, "uid": uid, "source": label}
 
 

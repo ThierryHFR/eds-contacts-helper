@@ -1,62 +1,36 @@
 # eds-contacts-helper
 
-Native Messaging helper for Thunderbird ↔ Evolution Data Server (EDS) contact synchronization.
+Local Native Messaging helper for the Thunderbird extension [`eds-contacts-integration`](https://github.com/ThierryHFR/eds-contacts-integration).
 
-## Overview
+## Purpose
 
-`eds-contacts-helper` is a Linux Native Messaging bridge used by the Thunderbird extension `eds-contacts-integration`.
-
-It allows Thunderbird to synchronize contacts with Evolution Data Server (EDS) without loading GNOME / libebook components directly inside Thunderbird.
-
-This architecture avoids instability and crashes caused by direct EDS access from Thunderbird WebExtensions.
-
----
-
-# Features
-
-* Bidirectional synchronization
-
-  * EDS → Thunderbird
-  * Thunderbird → EDS
-* Event-driven synchronization
-* Native Messaging integration
-* Evolution Data Server support
-* Thunderbird 140 ESR compatible
-* External helper process isolation
-* Linux desktop integration
-
----
-
-# Architecture
+The helper lets the extension access Evolution Data Server (EDS) without loading GNOME or libebook components inside Thunderbird.
 
 ```text
 Thunderbird Extension
-        ⇅ Native Messaging
+        ⇅ Native Messaging (local JSON messages)
 eds-contacts-helper
-        ⇅ libebook / EDS / DBus
+        ⇅ libebook / EDS / D-Bus
 Evolution Data Server
 ```
 
-The helper runs outside Thunderbird and communicates through JSON messages.
+Version 2.0.0 supports:
 
----
+* listing EDS address books and contacts;
+* detecting EDS contact changes;
+* adding a contact to EDS;
+* diagnostics for the required GObject Introspection namespaces.
 
-# Requirements
+The companion extension uses these operations for EDS → Thunderbird synchronization and, optionally, for adding newly created Thunderbird contacts to EDS. Updating or deleting an EDS contact from Thunderbird is not currently implemented.
 
-## Linux
+## Requirements
 
-Tested on:
-
-* Linux Mint 22.x
-* Ubuntu 24.x
-
-## Thunderbird
-
+* Linux (tested on Linux Mint 22.x and Ubuntu 24.x)
 * Thunderbird 140 ESR or newer
+* Python 3
+* Evolution Data Server and its GObject Introspection bindings
 
-## Packages
-
-### Debian / Ubuntu / Linux Mint
+On Debian, Ubuntu or Linux Mint:
 
 ```bash
 sudo apt install \
@@ -67,146 +41,43 @@ sudo apt install \
   gir1.2-ebookcontacts-1.2
 ```
 
----
+## Installation
 
-# Installation
-
-## 1. Extract archive
-
-```bash
-unzip eds-contacts-helper.zip
-cd eds-contacts-helper
-```
-
-## 2. Install helper
+Extract a release archive and run:
 
 ```bash
 ./install-native-helper.sh
 ```
 
-This installs:
+The installer copies:
 
-* Native Messaging manifest
-* Helper executable
-* Thunderbird integration files
+* the executable to `~/.local/bin/eds-contacts-helper.py`;
+* the Native Messaging manifest to `~/.mozilla/native-messaging-hosts/eds_contacts_helper.json`.
 
----
-
-# Thunderbird Extension
-
-Install the companion extension:
+The manifest only authorizes the production extension identifier:
 
 ```text
-eds-contacts-integration.xpi
+thierryhfr.eds-contacts-integration@addons.thunderbird.net
 ```
 
----
-
-# Testing
+Restart Thunderbird after installing or updating the helper.
 
 ## Diagnostics
 
 ```bash
 ~/.local/bin/eds-contacts-helper.py --test diagnostics
-```
-
-## List EDS sources
-
-```bash
 ~/.local/bin/eds-contacts-helper.py --test listSources
-```
-
-## List contacts
-
-```bash
 ~/.local/bin/eds-contacts-helper.py --test listContacts
 ```
 
----
+Technical logs are stored in `~/.cache/eds-contacts-helper.log`.
 
-# Logs
+## Privacy and security
 
-Logs are stored in:
+The helper communicates locally through standard input and output. It does not make network requests or send telemetry. It only accepts Native Messaging connections from the explicitly authorized Thunderbird extension ID. Contact data is processed in memory and is not intentionally written to the diagnostic log.
 
-```text
-~/.cache/eds-contacts-helper.log
-```
+Synchronization is disabled by default in the companion extension and requires explicit user consent.
 
----
+## License
 
-# Native Messaging
-
-The helper uses Mozilla Native Messaging.
-
-Installed manifest:
-
-```text
-~/.mozilla/native-messaging-hosts/eds_contacts_helper.json
-```
-
----
-
-# Synchronization Model
-
-## EDS → Thunderbird
-
-The helper listens for Evolution Data Server changes and notifies Thunderbird immediately.
-
-## Thunderbird → EDS
-
-The Thunderbird extension sends vCards to the helper through Native Messaging.
-
----
-
-# Current Status
-
-Experimental but functional.
-
-Implemented:
-
-* EDS → Thunderbird sync
-* Thunderbird → EDS sync
-* Event-driven updates
-* Address book recreation
-* vCard conversion
-* Native Messaging helper
-
----
-
-# Known Limitations
-
-* Linux only
-* Requires Evolution Data Server
-* No automatic helper installation from Thunderbird
-* Thunderbird Add-ons store cannot distribute native binaries directly
-
----
-
-# Security
-
-The helper only accepts connections from explicitly authorized Thunderbird extension IDs through:
-
-```json
-"allowed_extensions"
-```
-
-inside the Native Messaging manifest.
-
----
-
-# License
-
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
-
-You are free to:
-
-* use
-* study
-* modify
-* redistribute
-
-this software under the terms of the GPL v3 license.
-
-See the LICENSE file for details.
-
-SPDX-License-Identifier: GPL-3.0-only
+GPL-3.0-only
