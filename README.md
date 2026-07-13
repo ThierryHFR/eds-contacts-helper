@@ -14,7 +14,7 @@ eds-contacts-helper
 Evolution Data Server
 ```
 
-Version 2.0.0 supports:
+Version 2.0.1 supports:
 
 * listing EDS address books and contacts;
 * detecting EDS contact changes;
